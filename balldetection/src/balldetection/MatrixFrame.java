@@ -1,9 +1,12 @@
 package balldetection;
 
+import balldetection.processors.Processor;
+import java.awt.Dimension;
 import javax.swing.JFrame;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 
-public class MatrixFrame extends JFrame{
+public class MatrixFrame extends JFrame implements Processor{
     private MatrixPanel matrixPanel;
     
     public MatrixFrame(String title){
@@ -17,6 +20,17 @@ public class MatrixFrame extends JFrame{
     
     public void update(Mat mat){
         matrixPanel.setimagewithMat(mat);
+        this.setSize(dimensionFromSize(mat.size()));
         this.repaint();
+    }
+
+    @Override
+    public Mat process(Mat input) {
+        this.update(input);
+        return input;
+    }
+
+    private Dimension dimensionFromSize(Size size) {
+        return new Dimension((int)size.width, (int)size.height);
     }
 }

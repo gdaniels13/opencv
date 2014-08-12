@@ -1,24 +1,22 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package balldetection.processors;
 
+import javax.swing.JSlider;
 import org.opencv.core.Scalar;
 
-/**
- *
- * @author gregor
- */
 public class ScalarInput extends javax.swing.JFrame {
 
+    int val1, val2, val3;
+
     /**
-     * Creates new form ScalarInput
+     * rootPaneCheckingEnabled Creates new form ScalarInput
      */
     public ScalarInput() {
         initComponents();
+        val1 = 50;
+        val2 = 50;
+        val3 = 50;
+
+        this.setVisible(true);
     }
 
     /**
@@ -43,6 +41,19 @@ public class ScalarInput extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
+            }
+        });
+        jSlider1.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+                jSlider1CaretPositionChanged(evt);
+            }
+        });
+
         jLabel1.setText("First");
 
         jLabel2.setText("Second");
@@ -51,6 +62,12 @@ public class ScalarInput extends javax.swing.JFrame {
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jSlider1, org.jdesktop.beansbinding.ELProperty.create("${value}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
+
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jSlider2, org.jdesktop.beansbinding.ELProperty.create("${value}"), jTextField2, org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
@@ -121,34 +138,42 @@ public class ScalarInput extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextField3ActionPerformed
 
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
+
+    private void jSlider1CaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jSlider1CaretPositionChanged
+    }//GEN-LAST:event_jSlider1CaretPositionChanged
+
+    private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+        JSlider source = (JSlider) evt.getSource();
+        if (!source.getValueIsAdjusting()) {
+            val1 = (int) source.getValue();
+        }
+    }//GEN-LAST:event_jSlider1StateChanged
+
     /**
      * @param args the command line arguments
      */
-        public void init(){
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+    public void init() {
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ScalarInput().setVisible(true);
-            }
-        });
+//        try {
+//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+//                if ("Nimbus".equals(info.getName())) {
+//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+//                    break;
+//                }
+//            }
+//        } catch (ClassNotFoundException ex) {
+//            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (InstantiationException ex) {
+//            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (IllegalAccessException ex) {
+//            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+//            java.util.logging.Logger.getLogger(ScalarInput.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+//        }
+        //</editor-fold>
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -163,15 +188,7 @@ public class ScalarInput extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField3;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
-    public Scalar getScalar(){
-        double val1 = Double.parseDouble(jTextField1.getText())*2.55;
-        double val2 = Double.parseDouble(jTextField2.getText())*2.55;
-        double val3 = Double.parseDouble(jTextField3.getText())*2.55;
-        
-        return new Scalar(val1, val2,val3);
+    public Scalar getScalar() {
+        return new Scalar(jSlider1.getValue() * 2.55, jSlider2.getValue() * 2.55, jSlider3.getValue() * 2.55);
     }
-            
-    
-    
-
 }
