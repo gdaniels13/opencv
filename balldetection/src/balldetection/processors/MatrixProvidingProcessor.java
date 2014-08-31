@@ -21,8 +21,9 @@ public class MatrixProvidingProcessor implements Processor {
     @Override
     public Mat process(Mat input) {
         if (flag == null) {
-
-            return Highgui.imread(imagePath, Highgui.CV_LOAD_IMAGE_COLOR);
+            
+            Mat mat = Highgui.imread(imagePath, Highgui.CV_LOAD_IMAGE_COLOR);
+            
         }
         return Highgui.imread(imagePath, flag);
 

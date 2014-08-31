@@ -11,13 +11,15 @@ import org.opencv.highgui.VideoCapture;
 
 
 public class VideoProvidorProcessor implements Processor {
- VideoCapture capture;
+    VideoCapture capture;
+    String file;
     public VideoProvidorProcessor(int device) {
         this.capture=new VideoCapture(device);
     }
 
     public VideoProvidorProcessor(String file) {
         this.capture = new VideoCapture(file);
+        this.file = file;
         if (!capture.isOpened()){
             throw new ExceptionInInitializerError("unable to open specified file");
         }
@@ -26,9 +28,12 @@ public class VideoProvidorProcessor implements Processor {
     
     @Override
     public Mat process(Mat input) {
-        capture.read(input);
+        boolean result = capture.read(input);
         
-        
+        if(input == null || result ==false){
+            capture = new VideoCapture(file);
+            capture.read(input);
+        }
         return input;
     }
     
