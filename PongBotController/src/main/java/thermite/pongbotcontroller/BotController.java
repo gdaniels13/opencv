@@ -5,6 +5,7 @@
  */
 package thermite.pongbotcontroller;
 
+import balldetection.State;
 import java.awt.event.KeyEvent;
 
 /**

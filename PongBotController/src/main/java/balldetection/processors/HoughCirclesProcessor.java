@@ -29,14 +29,14 @@ public class HoughCirclesProcessor implements Processor {
     public Mat process(Mat input) {
 //        HoughCircles(input, circles, CV_HOUGH_GRADIENT, 3, 50);
 //        HoughCircles(input, circles, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT);
-//        HoughCircles(input, circles, CV_HOUGH_GRADIENT, 4, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT, CV_HOUGH_GRADIENT);
-        Imgproc.HoughCircles(input, circles, Imgproc.CV_HOUGH_GRADIENT, 2, input.height() / 4, 500, 50, 0, 0);
-
+//        Imgproc.HoughCircles(input, circles, CV_HOUGH_GRADIENT, 1, input.height()/15, 100, 40, 15, 150);
+          Imgproc.HoughCircles(input, circles, CV_HOUGH_GRADIENT, 1, input.height()/ 8, 100, 40, 15, 150);
         int rows = circles.rows();
 
         int elemSize = (int) circles.elemSize(); // Returns 12 (3 * 4bytes in a float)  
         float[] data = new float[rows * elemSize / 4];
-
+        System.out.println(""+ data.length+ " " + rows);
+        
         if (data.length > 0) {
             circles.get(0, 0, data); // Points to the first element and reads the whole thing  
             // into data2  

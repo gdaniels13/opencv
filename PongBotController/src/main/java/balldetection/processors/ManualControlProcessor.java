@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package thermite.pongbotcontroller;
+package balldetection.processors;
 
 import balldetection.processors.Processor;
 import java.util.logging.Level;
@@ -13,6 +13,7 @@ import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import org.opencv.core.Mat;
+import thermite.pongbotcontroller.BotController;
 
 /**
  *

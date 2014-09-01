@@ -1,4 +1,4 @@
-package thermite.pongbotcontroller;
+package balldetection;
 
 public class State {
 

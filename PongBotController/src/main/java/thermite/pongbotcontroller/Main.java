@@ -1,6 +1,7 @@
 package thermite.pongbotcontroller;
 
 
+import balldetection.processors.ManualControlProcessor;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
