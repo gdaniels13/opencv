@@ -9,8 +9,7 @@ public class GausianSmoothingProcessor implements Processor {
 
     @Override
     public Mat process(Mat input) {
-        Imgproc.GaussianBlur(input, input, new Size(9, 9),9);
-        
+        Imgproc.GaussianBlur(input, input, new Size(9,9),9);
         return input;
     }
     

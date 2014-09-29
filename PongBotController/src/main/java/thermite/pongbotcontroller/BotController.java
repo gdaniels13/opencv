@@ -5,8 +5,13 @@
  */
 package thermite.pongbotcontroller;
 
-import balldetection.State;
+import balldetection.Packet;
 import java.awt.event.KeyEvent;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jssc.SerialPortException;
 
 /**
  *
@@ -14,17 +19,13 @@ import java.awt.event.KeyEvent;
  */
 public class BotController extends javax.swing.JFrame {
 
-    /**
-     * Creates new form BotController
-     */
-    private State state;
 
+    boolean manual = false;
+    int pos = 50;
     public BotController() {
         initComponents();
-        state = new State();
-        state.setPaddle((byte) 0);
-        state.setMove((byte) 0);
         this.setVisible(true);
+
     }
 
     /**
@@ -37,61 +38,68 @@ public class BotController extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        runPaddle = new javax.swing.JToggleButton();
-        paddleSpeed = new javax.swing.JSlider();
-        jTextField1 = new javax.swing.JTextField();
-        botSpeed = new javax.swing.JSlider();
-        jTextField2 = new javax.swing.JTextField();
-        moveLeft = new javax.swing.JButton();
-        moveRight = new javax.swing.JButton();
+        jSlider1 = new javax.swing.JSlider();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        minTextField = new javax.swing.JTextField();
+        maxTextField = new javax.swing.JTextField();
+        goalTextField = new javax.swing.JTextField();
+        jButton4 = new javax.swing.JButton();
+        paddleToggle = new javax.swing.JToggleButton();
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        runPaddle.setText("Run Paddle");
-
-        paddleSpeed.setMaximum(255);
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, paddleSpeed, org.jdesktop.beansbinding.ELProperty.create("${value}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("text"));
-        bindingGroup.addBinding(binding);
-
-        botSpeed.setMaximum(255);
-
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, botSpeed, org.jdesktop.beansbinding.ELProperty.create("${value}"), jTextField2, org.jdesktop.beansbinding.BeanProperty.create("text"));
-        bindingGroup.addBinding(binding);
-
-        moveLeft.setText("LEFT");
-        moveLeft.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                moveLeftMousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                moveLeftMouseReleased(evt);
+        jSlider1.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                jSlider1StateChanged(evt);
             }
         });
-        moveLeft.addActionListener(new java.awt.event.ActionListener() {
+
+        jButton2.setText("Set Min");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                moveLeftActionPerformed(evt);
+                jButton2ActionPerformed(evt);
             }
         });
 
-        moveRight.setText("RIGHT");
-        moveRight.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                moveRightMousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                moveRightMouseReleased(evt);
+        jButton3.setText("Set Max");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
             }
         });
 
-        jButton1.setText("CLICK HERE TO ENABLE KEYBOARD CONTROL");
+        minTextField.setText("0");
+
+        maxTextField.setText("50");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jSlider1, org.jdesktop.beansbinding.ELProperty.create("${value}"), goalTextField, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        jButton4.setText("Set Goal");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+
+        paddleToggle.setText("RunPaddle");
+        paddleToggle.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                paddleToggleActionPerformed(evt);
+            }
+        });
+
+        jButton1.setText("Click for keyboard Controll");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jButton1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 jButton1KeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                jButton1KeyReleased(evt);
             }
         });
 
@@ -100,51 +108,54 @@ public class BotController extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(runPaddle)
-                                .addGap(18, 18, 18)
-                                .addComponent(paddleSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(botSpeed, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(minTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(maxTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                            .addComponent(jTextField2)))
+                        .addComponent(jButton1)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(98, 98, 98))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(107, 107, 107)
-                        .addComponent(moveLeft)
-                        .addGap(47, 47, 47)
-                        .addComponent(moveRight))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(jButton1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(goalTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 139, Short.MAX_VALUE)
+                        .addComponent(paddleToggle)
+                        .addGap(49, 49, 49))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(paddleSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(runPaddle))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(29, 29, 29)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(botSpeed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(61, 61, 61)
+                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 84, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(moveLeft)
-                    .addComponent(moveRight))
+                    .addComponent(jButton4)
+                    .addComponent(goalTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(paddleToggle))
                 .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton2)
+                    .addComponent(minTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jButton3)
+                        .addComponent(maxTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton1))
+                .addGap(69, 69, 69))
         );
 
         bindingGroup.bind();
@@ -152,72 +163,165 @@ public class BotController extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void moveLeftActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveLeftActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        
+        try{
+            
+        
+        SerialCommunicator.SendPacket(new Packet(Packet.SET_MIN, Integer.parseInt(minTextField.getText())));
+        }
+        catch(SerialPortException s){
+            
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        
+        try{
+            SerialCommunicator.SendPacket(new Packet(Packet.SET_MAX, Integer.parseInt(maxTextField.getText())));
+        }
+        catch(SerialPortException s){
+            
+        }    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jSlider1StateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_jSlider1StateChanged
+       
+//          try{
+//            SerialCommunicator.SendPacket(new Packet(Packet.SET_MIN, Integer.parseInt(goalTextField.getText())));
+//        }
+//        catch(SerialPortException s){
+//            
+//        } 
+        
+        
+    }//GEN-LAST:event_jSlider1StateChanged
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+
+          try{
+            SerialCommunicator.SendPacket(new Packet(Packet.SET_GOAL, Integer.parseInt(goalTextField.getText())));
+        }
+        catch(SerialPortException s){
+            
+        } 
 
 
-    }//GEN-LAST:event_moveLeftActionPerformed
 
-    private void moveLeftMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveLeftMousePressed
-        state.setMove(State.FORWARD);
-        state.setMoveSpeed((byte) botSpeed.getValue());
+    }//GEN-LAST:event_jButton4ActionPerformed
 
-
-    }//GEN-LAST:event_moveLeftMousePressed
-
-    private void moveRightMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveRightMousePressed
-        state.setMove(State.BACKWARD);
-        state.setMoveSpeed((byte) botSpeed.getValue());
-
-    }//GEN-LAST:event_moveRightMousePressed
-
-    private void moveLeftMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveLeftMouseReleased
-        state.setMoveSpeed(State.STOP);
-    }//GEN-LAST:event_moveLeftMouseReleased
-
-    private void moveRightMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_moveRightMouseReleased
-        state.setMoveSpeed((byte) 0);
-    }//GEN-LAST:event_moveRightMouseReleased
+    private void paddleToggleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paddleToggleActionPerformed
+        if(paddleToggle.isSelected()){
+            try {
+                SerialCommunicator.SendPacket(new Packet(Packet.PADDLE_BACKWARD, 200));
+            } catch (SerialPortException ex) {
+                Logger.getLogger(BotController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        else{
+            try {
+                SerialCommunicator.SendPacket(new Packet(Packet.PADDLE_FORWARD, 0));
+            } catch (SerialPortException ex) {
+                Logger.getLogger(BotController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_paddleToggleActionPerformed
 
     private void jButton1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyPressed
         switch(evt.getKeyCode()){
             case KeyEvent.VK_LEFT:
-                moveRightMousePressed(null);
+                if(pos == 100){
+                    pos  = 80;
+                }
+                else if (pos == 80){
+                    pos = 60;
+                }
+                else if (pos == 60){
+                    pos = 40;
+                }
+                else if (pos == 40){
+                    pos = 20;
+                }
+                else{
+                    pos = 0;
+                }
                 break;
             case KeyEvent.VK_RIGHT:
-                moveLeftMousePressed(null);
-                break;
+                if(pos == 0){
+                    pos = 20;
+                }
+                else if (pos == 20){
+                    pos = 40;
+                }
+                else if (pos == 40){
+                    pos =60;
+                }
+                else if (pos == 60){
+                    pos = 80;
+                }
+                else {
+                    pos = 100;
+                }
+            break;
         }
+        goalTextField.setText("" + pos);
     }//GEN-LAST:event_jButton1KeyPressed
 
-    private void jButton1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButton1KeyReleased
-        state.setMove(State.STOP);
-    }//GEN-LAST:event_jButton1KeyReleased
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+//        if(manual){
+//            try {;                SerialCommunicator.SendBytes(Packet.getBytes(Packet.AUTOMATIC, 1));
+//            } catch (SerialPortException ex) {
+//                Logger.getLogger(BotController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//            
+//        }
+//        else{
+//            try {
+//                SerialCommunicator.SendBytes(Packet.getBytes(Packet.AUTOMATIC,0));
+//            } catch (SerialPortException ex) {
+//                Logger.getLogger(BotController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        }
+//            manual = !manual;
+        
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JSlider botSpeed;
+    private javax.swing.JTextField goalTextField;
     private javax.swing.JButton jButton1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JButton moveLeft;
-    private javax.swing.JButton moveRight;
-    private javax.swing.JSlider paddleSpeed;
-    private javax.swing.JToggleButton runPaddle;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JSlider jSlider1;
+    private javax.swing.JTextField maxTextField;
+    private javax.swing.JTextField minTextField;
+    private javax.swing.JToggleButton paddleToggle;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
-    public State getStateObject() {
-        updateState();
+//    public byte[] getStateObject() {
+//        updateState();
+//        byte[] toReturn = state.getBytes();
+//        state.resetcount = 0;
+//        return toReturn;
+//    }
+//
+//    private void updateState() {
+//        if (runPaddle.isSelected()) {
+//            state.paddleSpeed = (byte) paddleSpeed.getValue();
+//        } else {
+//            state.paddleSpeed = 0;
+//        }
+//        
+//        
+//        
+//        
+//        state.goal = Byte.parseByte(GoalPosition.getText());
+//        state.calibrateMax = Byte.parseByte(MaxPosition.getText());
+//    }
 
-        return state;
-    }
-
-    private void updateState() {
-        if (runPaddle.isSelected()) {
-            state.setPaddleSpeed((byte) paddleSpeed.getValue());
-        } else {
-            state.setPaddleSpeed((byte) 0);
-        }
-
+    byte getGoal() {
+        return Byte.parseByte(goalTextField.getText());
     }
 
 }

@@ -1,38 +1,38 @@
 package thermite.pongbotcontroller;
 
 
-import balldetection.processors.ManualControlProcessor;
-import jssc.SerialPort;
+import balldetection.Packet;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jssc.SerialPortException;
-import jssc.SerialPortList;
 
 public class Main {
-
+    static Timer t;
+    private static BotController bc;
+    
     public static void main(String[] args) throws SerialPortException, InterruptedException {
-//        String[] portNames = SerialPortList.getPortNames();
-//
-//        for (int i = 0; i < portNames.length; i++) {
-//            System.out.println(portNames[i]);
-//        }
-//        
-//        SerialPort serialPort = new SerialPort(portNames[0]);
-//        serialPort.openPort();
-//        serialPort.setParams(9600, 8, 1, 0);
-//        
-//        Thread.sleep(2000);
-//        State state = new State();
-//        state.move=0;
-//        state.paddle = 1;
-//        state.motorASpeed = 100;
-//        state.motorBSpeed = 0;
-//        serialPort.writeBytes(state.getBytes());
         
-        ManualControlProcessor mcp = new ManualControlProcessor();
+        bc = new BotController();
+        t = new Timer();
+        t.schedule(new TimerTask() {
+            private byte lastGoal = 50;
+            @Override
+            public void run() {
+                try {
+                    byte curGoal = bc.getGoal();
+                    if(curGoal != lastGoal){
+                        SerialCommunicator.SendPacket(new Packet(Packet.SET_GOAL, curGoal));
+                        lastGoal = curGoal;
+                        System.out.println(curGoal);
+                    }
+                } catch (Throwable ex) {
+                    System.out.println("Failed to send new goal");
+                }
+            }
+        }, 0, 100);
         
-        while(true)
-            mcp.process(null);
-        
-    
-    
     }
+
 }

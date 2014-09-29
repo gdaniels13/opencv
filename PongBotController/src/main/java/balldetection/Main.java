@@ -7,16 +7,10 @@ import balldetection.processors.ContourProcessor;
 import balldetection.processors.GausianSmoothingProcessor;
 import balldetection.processors.HoughCirclesProcessor;
 import balldetection.processors.InRangeProcessor;
-import balldetection.processors.MatrixProvidingProcessor;
 import balldetection.processors.Processor;
-import balldetection.processors.TuningInRangeProcessor;
 import balldetection.processors.VideoProvidorProcessor;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jssc.SerialPortException;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
@@ -33,9 +27,12 @@ public class Main {
         processors.add(new ColorConverterProcessor(Imgproc.COLOR_BGR2HSV));
 
         processors.add(new InRangeProcessor(new Scalar(9, 70, 80, 0), new Scalar(19, 250, 250, 0)));
-        processors.add(new GausianSmoothingProcessor());
-        processors.add(new MatrixFrame("after ranging and smoothing"));
+//        processors.add(new MatrixFrame("after ranging"));
 
+        processors.add(new GausianSmoothingProcessor());
+//        processors.add(new CannyProcessor(false));
+//        processors.add(new MatrixFrame("after Smoothing"));
+//        processors.add(new HoughCirclesProcessor());
 //        processors.add(new ContourProcessor());
         processors.add(new AutoControlProcessor());
 
@@ -47,7 +44,7 @@ public class Main {
                 proce.process();
             } catch (Throwable t) {
                 //just catch it and keep going
-                System.out.println("got an exception");
+                t.printStackTrace();
             }
         }
     }

@@ -31,7 +31,6 @@ public class ContourProcessor implements Processor {
         
         findContours(input, contours, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
         
-        
         for (MatOfPoint mat : contours) {
             Point p = new Point();
             float[] r = new float[4] ;
@@ -39,11 +38,17 @@ public class ContourProcessor implements Processor {
             centers.add(p);
             radii.add(r);
         }
+        
         List<float[]> copy = new ArrayList<>();
         copy.addAll(radii);
-        for (int max : findTopN(copy,2)) {
-            
+        for (int max : findTopN(copy,15)) {
+            if(max == -1){
+                continue;
+            }
             Point maxPoint = centers.get(max);
+            if(radii.get(max)[0]<25 || radii.get(max)[0]>80){
+                continue;
+            }
             Core.ellipse(input, maxPoint, new Size(radii.get(max)[0],radii.get(max)[0]), 0, 0, 360,new Scalar(255, 0, 255), 4, 8, 0);
         }        
         
@@ -54,12 +59,23 @@ public class ContourProcessor implements Processor {
         int[] toReturn = new int[count];
         for (int i = 0; i < count; i++) {
             toReturn[i] = findMax(list);
+            if(toReturn[i]== -1){
+                return toReturn;
+            }
             list.remove(toReturn[i]);
         }
         return toReturn;
         
     }
+    
+    public float getLargestRadii(){
+        return radii.get(findMax(radii))[0];
+    }
+    
     private int findMax(List<float[]> list){
+        if(list.isEmpty()){
+            return -1;
+        }
         float max = list.get(0)[0];
         int maxpos=0;
         for (int i = 0; i < list.size(); i++) {
@@ -71,15 +87,17 @@ public class ContourProcessor implements Processor {
         
         return maxpos;
     }
+    
     public List<Point> getTopN(int n){
       List<float[]> copy = new ArrayList<>();
         copy.addAll(radii);
         List<Point> toReturn = new ArrayList<>();
-        for (int max : findTopN(copy,2)) {
+        for (int max : findTopN(copy,n)) {
+            if(max == -1)
+                continue;
             
             toReturn.add(centers.get(max));
         }
-        
         return  toReturn;
     }
 }

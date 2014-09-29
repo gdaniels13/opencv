@@ -10,6 +10,8 @@ import balldetection.processors.Processor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jssc.SerialPort;
+import jssc.SerialPortEvent;
+import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
 import org.opencv.core.Mat;
@@ -29,6 +31,17 @@ public class ManualControlProcessor implements Processor {
         serialPort = new SerialPort(SerialPortList.getPortNames()[0]);
         serialPort.openPort();
         serialPort.setParams(SerialPort.BAUDRATE_115200,8,1,0);
+        serialPort.addEventListener(new SerialPortEventListener() {
+
+            @Override
+            public void serialEvent(SerialPortEvent serialPortEvent) {
+                try {
+                    System.out.println(serialPort.readString());
+                } catch (SerialPortException ex) {
+                    Logger.getLogger(ManualControlProcessor.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
         Thread.sleep(2000);
     }
     
@@ -43,11 +56,12 @@ public class ManualControlProcessor implements Processor {
         }
         
         
+        
         return input;
     }
 
     private void move() throws SerialPortException {
-        serialPort.writeBytes(botController.getStateObject().getBytes());
+//        serialPort.writeBytes(botController.getStateObject());
     }
     
 }

@@ -28,7 +28,7 @@ public class CannyProcessor implements Processor {
         if (debug) {
             Imgproc.Canny(input, input, upper.getValue(), lower.getValue());
         } else {
-            Imgproc.Canny(input, input, 274, 242);
+            Imgproc.Canny(input, input, 344, 226);
         }
         return input;
     }
