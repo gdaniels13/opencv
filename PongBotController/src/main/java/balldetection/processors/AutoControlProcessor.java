@@ -6,6 +6,8 @@
 
 package balldetection.processors;
 
+import balldetection.Circle;
+import balldetection.MatrixFrame;
 import balldetection.Packet;
 import static balldetection.Packet.*;
 import java.util.List;
@@ -16,16 +18,22 @@ import java.util.logging.Logger;
 import jssc.SerialPort;
 import jssc.SerialPortException;
 import jssc.SerialPortList;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 
 public class AutoControlProcessor implements Processor {
-    ContourProcessor cp = new ContourProcessor();
+    CircleFinderProcessor cfp;
+    MatrixFrame mf;
     SerialPort serialPort;
-    private int goal;
+    private volatile int goal;
 
     private Timer t;
     public AutoControlProcessor() throws SerialPortException, InterruptedException {
+        cfp = new CircleFinderProcessor();
+        mf = new MatrixFrame("circles");
         serialPort = new SerialPort(SerialPortList.getPortNames()[0]);
         serialPort.openPort();
         serialPort.setParams(SerialPort.BAUDRATE_115200,8,1,0);
@@ -43,7 +51,7 @@ public class AutoControlProcessor implements Processor {
                         goal *=25;
                         writeGoalToBot();
                         lastGoal = goal;
-                        System.out.println(goal);
+//                        System.out.println("goal is :" + goal);
                     }
                 } catch (Throwable ex) {
                     System.out.println("Failed to send new goal");
@@ -57,7 +65,15 @@ public class AutoControlProcessor implements Processor {
     
     @Override
     public Mat process(Mat input) {
-        input = cp.process(input);
+        Mat temp = input.clone();
+                //new Mat(input, new Rect(0, 0, input.width(), input.height()));
+//        input.copyTo(temp);
+        input = cfp.process(input);
+        drawCircles(temp,cfp.getCircles());
+        
+        mf.process(temp);
+        
+        
         try {
             calculateGoal(input);
         } catch (SerialPortException ex) {
@@ -76,32 +92,32 @@ public class AutoControlProcessor implements Processor {
     }
     
     private void calculateGoal(Mat input) throws SerialPortException {
-        
-//        System.out.println(cp.getLargestRadii());
-        List<Point> topN = cp.getTopN(3);
-        if(topN.isEmpty()){
-            return;
-        }
-        // get closest one to the edge y
-        Point max = topN.get(0);
-        
-        for (Point point : topN) {
-            if(point.x<max.x){
-                max = point;
+         List<Circle> balls = cfp.getCircles();
+         if(balls.isEmpty()) return ;
+         Circle closest = balls.get(0);
+         for (Circle circle : balls) {
+            if(closest.getY()<circle.getY()){
+                closest = circle;
             }
+         }
+         
+         goal =(int) Math.round((closest.getX()/input.cols())*100);
+          System.out.println("Goal:" + goal);
+         
+          if(goal<10){
+              goal = 0;
+          }
+          else if (goal>80){
+              goal +=15;
+          }
+          else if(goal > 30){
+              goal +=10;
+          }
+    }
+
+    private void drawCircles(Mat input, List<Circle> circles) {
+        for (Circle circle : circles) {
+            Core.ellipse(input, new Point(circle.getX(), circle.getY()), new Size(circle.getRadius(),circle.getRadius()), 0, 0, 360,new Scalar(255, 0, 255), 4, 8, 0);
         }
-        
-        
-        
-        
-        
-        if(topN.isEmpty()){
-            return;
-        }
-        goal  =  (int) ((max.x/input.cols())*100);
-        
-//        System.out.println(goal);
-        
-//        serialPort.writeBytes(Packet.getBytes(SET_GOAL, goal));
     }
 }

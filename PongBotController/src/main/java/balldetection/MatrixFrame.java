@@ -2,8 +2,10 @@ package balldetection;
 
 import balldetection.processors.Processor;
 import java.awt.Dimension;
+import java.util.ArrayDeque;
 import javax.swing.JFrame;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 
 public class MatrixFrame extends JFrame implements Processor{
@@ -32,5 +34,9 @@ public class MatrixFrame extends JFrame implements Processor{
 
     private Dimension dimensionFromSize(Size size) {
         return new Dimension((int)size.width, (int)size.height);
+    }
+    
+    public double[][] getLast4(){
+        return matrixPanel.getLast4();
     }
 }

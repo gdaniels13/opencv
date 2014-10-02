@@ -2,9 +2,14 @@
 package balldetection;
 
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
 import javax.swing.JPanel;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 
 /**
  *
@@ -13,9 +18,31 @@ import org.opencv.core.Mat;
 public class MatrixPanel extends JPanel {
     private static final long serialVersionUID = 1L;  
    private BufferedImage image;    
+   private double[][] last4;
+   private int count;
    // Create a constructor method  
    public MatrixPanel(){  
      super();  
+     count =0;
+     last4 = new double[4][];
+     
+       for (double[] ds : last4) {
+           ds = null;
+       }
+     
+     this.addMouseListener(new MouseAdapter() {
+
+         @Override
+         public void mouseClicked(MouseEvent e){
+             if(count>3){
+                 return;
+             }
+             last4[count] = new double[2];
+             last4[count][0] = (float)e.getX();
+             last4[count][1] = (float)e.getY();
+             count++;
+         }
+     });
    }  
    private BufferedImage getimage(){  
      return image;  
@@ -64,7 +91,12 @@ public class MatrixPanel extends JPanel {
       BufferedImage temp=getimage();  
       //Graphics2D g2 = (Graphics2D)g;
       if( temp != null)
-        g.drawImage(temp,10,10,temp.getWidth(),temp.getHeight(), this);  
+        g.drawImage(temp,0,0,temp.getWidth(),temp.getHeight(), this);  
    }  
+
+    public double[][] getLast4() {
+        return last4;
+    }
+   
 }
 

@@ -6,6 +6,7 @@
 
 package balldetection.processors;
 
+import balldetection.Circle;
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.Core;
@@ -31,6 +32,8 @@ public class ContourProcessor implements Processor {
         
         findContours(input, contours, new Mat(), RETR_TREE, CHAIN_APPROX_SIMPLE);
         
+        
+        
         for (MatOfPoint mat : contours) {
             Point p = new Point();
             float[] r = new float[4] ;
@@ -38,66 +41,34 @@ public class ContourProcessor implements Processor {
             centers.add(p);
             radii.add(r);
         }
-        
+        //System.out.println(centers.size());
         List<float[]> copy = new ArrayList<>();
         copy.addAll(radii);
-        for (int max : findTopN(copy,15)) {
-            if(max == -1){
-                continue;
-            }
-            Point maxPoint = centers.get(max);
-            if(radii.get(max)[0]<25 || radii.get(max)[0]>80){
-                continue;
-            }
-            Core.ellipse(input, maxPoint, new Size(radii.get(max)[0],radii.get(max)[0]), 0, 0, 360,new Scalar(255, 0, 255), 4, 8, 0);
+//        for (int max : findTopN(copy,15)) {
+        for(int i = 0; i<centers.size(); ++i){
+//            if(max == -1){
+//                continue;
+//            }
+            Point maxPoint = centers.get(i);
+            double radius = radii.get(i)[0];
+
+            Core.ellipse(input, maxPoint, new Size(radius,radius), 0, 0, 360,new Scalar(255, 0, 255), 4, 8, 0);
         }        
         
         return input;
     }
-
-    private int[] findTopN(List<float[]> list, int count){
-        int[] toReturn = new int[count];
-        for (int i = 0; i < count; i++) {
-            toReturn[i] = findMax(list);
-            if(toReturn[i]== -1){
-                return toReturn;
+    
+    public List<Circle> getCircles(){
+        List<Circle> toReturn = new ArrayList<>();
+        for(int i = 0;i<centers.size(); ++i){
+            Point center = centers.get(i);
+            double radius = radii.get(i)[0];
+            if(radius<15){
+                continue;
             }
-            list.remove(toReturn[i]);
+            toReturn.add(new Circle(center.x+15, center.y+15, radius));
         }
         return toReturn;
-        
     }
-    
-    public float getLargestRadii(){
-        return radii.get(findMax(radii))[0];
-    }
-    
-    private int findMax(List<float[]> list){
-        if(list.isEmpty()){
-            return -1;
-        }
-        float max = list.get(0)[0];
-        int maxpos=0;
-        for (int i = 0; i < list.size(); i++) {
-            if(list.get(i)[0]>max){
-                max=list.get(i)[0];
-                maxpos=i;
-            }
-        }
-        
-        return maxpos;
-    }
-    
-    public List<Point> getTopN(int n){
-      List<float[]> copy = new ArrayList<>();
-        copy.addAll(radii);
-        List<Point> toReturn = new ArrayList<>();
-        for (int max : findTopN(copy,n)) {
-            if(max == -1)
-                continue;
-            
-            toReturn.add(centers.get(max));
-        }
-        return  toReturn;
-    }
+
 }
