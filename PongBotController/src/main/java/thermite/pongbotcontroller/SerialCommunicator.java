@@ -20,19 +20,19 @@ import jssc.SerialPortList;
 public class SerialCommunicator {
     private static final SerialPort serialPort =       
                     new SerialPort(SerialPortList.getPortNames()[0]);
-    static{
-        try {
-            serialPort.openPort();
-            serialPort.setParams(SerialPort.BAUDRATE_115200,8,1,0);
-            Thread.sleep(2000);
-        } catch (SerialPortException ex) {
-            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-    
+//    static{
+//        try {
+//            serialPort.openPort();
+//            serialPort.setParams(SerialPort.BAUDRATE_115200,8,1,0);
+//            Thread.sleep(2000);
+//        } catch (SerialPortException ex) {
+//            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//
+//    }
+//    
     public static void SendPacket(Packet p) throws SerialPortException{
         serialPort.writeBytes(p.getBytes());
     }

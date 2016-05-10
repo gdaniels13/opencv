@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package balldetection.processors;
 
 import balldetection.Circle;
 import balldetection.MatrixFrame;
 import balldetection.Packet;
 import static balldetection.Packet.*;
+import gcode.GcodeStreamer;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,55 +25,54 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 
 public class AutoControlProcessor implements Processor {
+
     CircleFinderProcessor cfp;
     MatrixFrame mf;
-    SerialPort serialPort;
     private volatile int goal;
 
+    GcodeStreamer streamer;
+
     private Timer t;
+
     public AutoControlProcessor() throws SerialPortException, InterruptedException {
         cfp = new CircleFinderProcessor();
         mf = new MatrixFrame("circles");
-        serialPort = new SerialPort(SerialPortList.getPortNames()[0]);
-        serialPort.openPort();
-        serialPort.setParams(SerialPort.BAUDRATE_115200,8,1,0);
-        Thread.sleep(4000);
-        serialPort.writeBytes(Packet.getBytes(PADDLE_BACKWARD, 255));
-        
+        streamer = new GcodeStreamer();
+
         t = new Timer();
         t.schedule(new TimerTask() {
             private int lastGoal = 50;
+            private boolean lastResult = false;
+
             @Override
             public void run() {
                 try {
-                    if(goal != lastGoal){
-                        goal = goal/25;
-                        goal *=25;
-                        writeGoalToBot();
-                        lastGoal = goal;
-//                        System.out.println("goal is :" + goal);
+                    if (Math.abs(goal - lastGoal) > 1 || !lastResult) {
+                        streamer.moveToPercent(goal);
                     }
+//                        goal = goal/25;
+//                        goal *=25;
+//                        lastGoal = goal;
+////                        System.out.println("goal is :" + goal);
+//                    }
                 } catch (Throwable ex) {
                     System.out.println("Failed to send new goal");
                 }
             }
         }, 0, 100);
-        
+
     }
-    
-    
-    
+
     @Override
     public Mat process(Mat input) {
         Mat temp = input.clone();
-                //new Mat(input, new Rect(0, 0, input.width(), input.height()));
+        //new Mat(input, new Rect(0, 0, input.width(), input.height()));
 //        input.copyTo(temp);
         input = cfp.process(input);
-        drawCircles(temp,cfp.getCircles());
-        
+        drawCircles(temp, cfp.getCircles());
+
         mf.process(temp);
-        
-        
+
         try {
             calculateGoal(input);
         } catch (SerialPortException ex) {
@@ -82,42 +81,46 @@ public class AutoControlProcessor implements Processor {
         return input;
     }
 
-    private void writeGoalToBot(){
-        try {
-            serialPort.writeBytes(Packet.getBytes(SET_GOAL, goal));
-        } catch (SerialPortException ex) {
-            Logger.getLogger(AutoControlProcessor.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-    }
-    
+//    private void writeGoalToBot(){
+//        try {
+//            serialPort.writeBytes(Packet.getBytes(SET_GOAL, goal));
+//        } catch (SerialPortException ex) {
+//            Logger.getLogger(AutoControlProcessor.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     private void calculateGoal(Mat input) throws SerialPortException {
-         List<Circle> balls = cfp.getCircles();
-         if(balls.isEmpty()) return ;
-         Circle closest = balls.get(0);
-         for (Circle circle : balls) {
-            if(closest.getY()<circle.getY()){
-                closest = circle;
+        List<Circle> balls = cfp.getCircles();
+        if (balls.isEmpty()) {
+            goal = 50;
+        } else {
+
+            Circle closest = balls.get(0);
+            for (Circle circle : balls) {
+                if (closest.getY() < circle.getY()) {
+                    closest = circle;
+                }
             }
-         }
-         
-         goal =(int) Math.round((closest.getX()/input.cols())*100);
-          System.out.println("Goal:" + goal);
-         
-          if(goal<10){
-              goal = 0;
-          }
-          else if (goal>80){
-              goal +=15;
-          }
-          else if(goal > 30){
-              goal +=10;
-          }
+
+            goal = (int) Math.round((closest.getX() / input.cols()) * 100);
+//          System.out.println("Goal:" + goal);
+
+            if (goal < 10) {
+                goal = 0;
+            } else if (goal > 90) {
+                goal = 100;
+            }
+//          else if (goal>80){
+//              goal +=15;
+//          }
+//          else if(goal > 30){
+//              goal +=10;
+//          }
+        }
     }
 
     private void drawCircles(Mat input, List<Circle> circles) {
         for (Circle circle : circles) {
-            Core.ellipse(input, new Point(circle.getX(), circle.getY()), new Size(circle.getRadius(),circle.getRadius()), 0, 0, 360,new Scalar(255, 0, 255), 4, 8, 0);
+            Core.ellipse(input, new Point(circle.getX(), circle.getY()), new Size(circle.getRadius(), circle.getRadius()), 0, 0, 360, new Scalar(255, 0, 255), 4, 8, 0);
         }
     }
 }

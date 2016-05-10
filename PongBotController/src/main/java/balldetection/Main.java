@@ -13,7 +13,9 @@ import jssc.SerialPortException;
 public class Main {
 
     static {
-        System.loadLibrary("opencv_java249");
+//        System.loadLibrary("opencv_java249");
+//        System.loadLibrary(org.opencv.core.Core.NATIVE_LIBRARY_NAME);
+        nu.pattern.OpenCV.loadShared();
     }
 
     public static void main(String[] args) throws SerialPortException, InterruptedException {
@@ -21,10 +23,11 @@ public class Main {
         processors.add(new VideoProvidorProcessor(0));
         processors.add(new PerspectiveTransformProcessor());
         //processors.add(new PausingProcessor());
+//        processors.add(new MatrixFrame("asdf"));
         processors.add(new AutoControlProcessor());
-        
+
         ImageProcessor proce = new ImageProcessor(processors);
-        
+
         while (true) {
             try {
                 proce.process();
