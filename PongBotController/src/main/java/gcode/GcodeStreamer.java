@@ -10,7 +10,7 @@ import thermite.pongbotcontroller.SerialCommunicator;
 public class GcodeStreamer {
 
     private final SerialPort serialPort ;//= new SerialPort(SerialPortList.getPortNames()[0]);
-    private int max = 500;
+    private int max = 400;
     
     private static final String OK = "ok";
 
@@ -20,6 +20,7 @@ public class GcodeStreamer {
             serialPort.openPort();
             serialPort.setParams(SerialPort.BAUDRATE_115200, 8, 1, 0);
             Thread.sleep(2000);
+            sendGcode("G90");
         } catch (SerialPortException | InterruptedException ex) {
             Logger.getLogger(SerialCommunicator.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -79,7 +80,7 @@ public class GcodeStreamer {
         return !checkIdle();
     }
     
-    private boolean checkIdle() throws SerialPortException {
+    public boolean checkIdle() throws SerialPortException {
         serialPort.writeString("?");
         String response = waitForResponse();
         System.out.println(response);

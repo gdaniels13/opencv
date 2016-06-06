@@ -1,11 +1,14 @@
 package balldetection;
 
+import balldetection.gameStrategies.DefaultAi;
 import balldetection.processors.AutoControlProcessor;
 import balldetection.processors.CircleFinderProcessor;
+import balldetection.processors.ImageRotatingProcessor;
 import balldetection.processors.PausingProcessor;
 import balldetection.processors.PerspectiveTransformProcessor;
 import balldetection.processors.Processor;
 import balldetection.processors.VideoProvidorProcessor;
+import balldetection.processors.WindowSelectingProcessor;
 import balldetection.processors.warpAfineProcessor;
 import java.util.ArrayList;
 import jssc.SerialPortException;
@@ -21,10 +24,13 @@ public class Main {
     public static void main(String[] args) throws SerialPortException, InterruptedException {
         ArrayList<Processor> processors = new ArrayList<>();
         processors.add(new VideoProvidorProcessor(0));
+//        processors.add(new PausingProcessor());
+//        processors.add(new ImageRotatingProcessor(ImageRotatingProcessor.rotate90()));
+//        processors.add(new WindowSelectingProcessor());
         processors.add(new PerspectiveTransformProcessor());
         //processors.add(new PausingProcessor());
 //        processors.add(new MatrixFrame("asdf"));
-        processors.add(new AutoControlProcessor());
+        processors.add(new AutoControlProcessor(true,new DefaultAi()));
 
         ImageProcessor proce = new ImageProcessor(processors);
 

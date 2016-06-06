@@ -19,13 +19,10 @@ public class Circle {
         }
         return false;
     }
- 
     
     public static double distance(Circle a, Circle b){
         return Math.sqrt(Math.pow(a.x-b.x,2) + Math.pow(b.y-a.y,2));
     }
-    
-    
     
     public double getX() {
         return x;
