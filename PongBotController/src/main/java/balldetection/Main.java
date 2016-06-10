@@ -30,7 +30,7 @@ public class Main {
 //        processors.add(new PerspectiveTransformProcessor());
         //processors.add(new PausingProcessor());
 //        processors.add(new MatrixFrame("asdf"));
-        processors.add(new AutoControlProcessor(false,new DefaultAi()));
+        processors.add(new AutoControlProcessor(true,new DefaultAi()));
 
         ImageProcessor proce = new ImageProcessor(processors);
 

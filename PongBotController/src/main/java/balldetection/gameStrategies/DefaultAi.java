@@ -1,13 +1,13 @@
 package balldetection.gameStrategies;
 
 import balldetection.Circle;
+import balldetection.processors.AutoControlProcessor;
 import java.util.List;
 import org.opencv.core.Mat;
 
 
 public class DefaultAi implements AiInterface {
-    private int goal = 50;
-    
+       
     @Override
     public void calculateGoal(List<Circle> balls,Mat input) {
         if (!balls.isEmpty()) {
@@ -17,18 +17,22 @@ public class DefaultAi implements AiInterface {
                     closest = circle;
                 }
             }
-            goal = (int) Math.round((closest.getX() / input.cols()) * 100);
-            if (goal < 15) {
+            int goal = (int) Math.round((closest.getX() / input.cols()) * 100);
+            if (goal < 20) {
                 goal = 0;
-            } else if (goal > 85) {
-                goal = 100;
+            } else if (goal<86 ){
+                goal +=2;
             }
+            else if (goal > 85) {
+                goal = 100;
+            } 
+            AutoControlProcessor.goal = goal;
         }
     }
 
     @Override
     public int getGoal() {
-        return goal;
+        return AutoControlProcessor.goal;
     }
 
 }

@@ -10,7 +10,7 @@ import thermite.pongbotcontroller.SerialCommunicator;
 public class GcodeStreamer {
 
     private final SerialPort serialPort ;//= new SerialPort(SerialPortList.getPortNames()[0]);
-    private int max = 400;
+    private int max = 420;
     
     private static final String OK = "ok";
 
@@ -42,7 +42,7 @@ public class GcodeStreamer {
     }
     
     public boolean moveXTo(int x){
-        return sendGcode("G0 x" + x + "\n");
+        return sendGcode("G90 G0 x" + x + "\n");
     }
 
     public boolean moveToPercent(int x){
@@ -50,16 +50,17 @@ public class GcodeStreamer {
             return false;
         }
         Double target = (x/100.0) * max;
+        System.out.println("%= " + x + " x = " + target);
         return moveXTo(target.intValue());
     }
     
     private boolean sendCommand(String command) throws SerialPortException {
         boolean result;
-        if(checkIdle()){
+//        if(checkIdle()){
             result = serialPort.writeString(command);
             return result;
-        }
-        return false;
+//        }
+//        return false;
     }
     
     private String waitForResponse() throws SerialPortException{
@@ -83,7 +84,7 @@ public class GcodeStreamer {
     public boolean checkIdle() throws SerialPortException {
         serialPort.writeString("?");
         String response = waitForResponse();
-        System.out.println(response);
+//        System.out.println(response);
         if(response.contains("Idle")){
             return true;
         }

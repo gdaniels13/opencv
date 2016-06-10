@@ -26,10 +26,10 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 
 public class AutoControlProcessor implements Processor {
+    public static volatile int goal;
 
     CircleFinderProcessor cfp;
     MatrixFrame mf;
-    private volatile int goal;
 
     GcodeStreamer streamer;
 
@@ -47,20 +47,27 @@ public class AutoControlProcessor implements Processor {
         t.schedule(new TimerTask() {
             private int lastGoal = 0;
             private boolean lastResult = false;
+            private int nmc=0;
 
             @Override
             public void run() {
-                goal = ai.getGoal();
+                if(!streamGcode) {
+                    return;
+                }
                 try {
-                    if (streamGcode && Math.abs(goal - lastGoal) > 1 && streamer.checkIdle()) {
+                    if ((Math.abs(goal - lastGoal) > 1 && streamer.checkIdle()) || nmc >10 ) {
                         streamer.moveToPercent(goal);
                         goal = lastGoal;
+                        nmc =0;
+                    }
+                else{
+                        nmc ++;
                     }
                 } catch (Throwable ex) {
                     System.out.println("Failed to send new goal");
                 }
             }
-        }, 0, 10);
+        }, 0, 50);
     }
 
     @Override
@@ -83,44 +90,10 @@ public class AutoControlProcessor implements Processor {
         return input;
     }
 
-//    private void writeGoalToBot(){
-//        try {
-//            serialPort.writeBytes(Packet.getBytes(SET_GOAL, goal));
-//        } catch (SerialPortException ex) {
-//            Logger.getLogger(AutoControlProcessor.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
     private void calculateGoal(Mat input) throws SerialPortException {
         ai.calculateGoal(cfp.getCircles(), input);
         
- //        if (!balls.isEmpty()) {
-////            goal = 50;
-////        } else {
-//
-//            Circle closest = balls.get(0);
-//            for (Circle circle : balls) {
-//                if (closest.getY() < circle.getY()) {
-//                    closest = circle;
-//                }
-//            }
-//            goal = (int) Math.round((closest.getX() / input.cols()) * 100);
-////          System.out.println("Goal:" + goal);
-//
-//            if (goal < 15) {
-//                goal = 0;
-//            } else if (goal > 85) {
-//                goal = 100;
-//            }
-//            
-//            
-////          else if (goal>80){
-////              goal +=15;
-////          }
-////          else if(goal > 30){
-////              goal +=10;
-////          }
-//        }
-    }
+     }
 
     private void drawCircles(Mat input, List<Circle> circles) {
         for (Circle circle : circles) {
@@ -129,7 +102,7 @@ public class AutoControlProcessor implements Processor {
     }
 
     private void drawGoal(Mat temp) {
-        int location = (int) (temp.size().width * goal/100.0);
+        int location = (int) (temp.size().width * ai.getGoal()/100.0);
         
         Core.arrowedLine(temp, new Point(location, temp.size().height), new Point(location, temp.size().height-100), new Scalar(255, 0, 255), 5, Core.LINE_8, 0, .25);
     }

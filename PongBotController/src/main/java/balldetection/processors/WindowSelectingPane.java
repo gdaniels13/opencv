@@ -34,17 +34,17 @@ public class WindowSelectingPane extends javax.swing.JFrame {
      */
     public WindowSelectingPane() {
         initComponents();
-        px1.setValue(5);
-        py1.setValue(5);
+        px1.setValue(95);
+        py1.setValue(136);
         
-        px2.setValue(460);
-        py2.setValue(15);
+        px2.setValue(377);
+        py2.setValue(126);
         
-        px3.setValue(5);
-        py3.setValue(600);
+        px3.setValue(55);
+        py3.setValue(553);
         
-        px4.setValue(460);
-        py4.setValue(600);
+        px4.setValue(423);
+        py4.setValue(562);
 
         setSize(400,200);
         setVisible(true);
