@@ -19,10 +19,11 @@ public class WindowSelectingPane extends javax.swing.JFrame {
 
     public List<Point> getPoints(){
         List<Point> points = new ArrayList<>();
-        points.add(getPoint(tlx,tly));
-        points.add(getPoint(blx,bly));
-        points.add(getPoint(trx,trY));
-        points.add(getPoint(brx,bry));
+
+        points.add(getPoint(px1,py1));
+        points.add(getPoint(px2,py2));
+        points.add(getPoint(px3,py3));
+        points.add(getPoint(px4,py4));
         return points;
     }
     
@@ -33,6 +34,18 @@ public class WindowSelectingPane extends javax.swing.JFrame {
      */
     public WindowSelectingPane() {
         initComponents();
+        px1.setValue(5);
+        py1.setValue(5);
+        
+        px2.setValue(460);
+        py2.setValue(15);
+        
+        px3.setValue(5);
+        py3.setValue(600);
+        
+        px4.setValue(460);
+        py4.setValue(600);
+
         setSize(400,200);
         setVisible(true);
     }
@@ -45,106 +58,81 @@ public class WindowSelectingPane extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        tlx = new javax.swing.JSpinner();
-        tly = new javax.swing.JSpinner();
-        trx = new javax.swing.JSpinner();
-        trY = new javax.swing.JSpinner();
-        blx = new javax.swing.JSpinner();
-        bly = new javax.swing.JSpinner();
-        brx = new javax.swing.JSpinner();
-        bry = new javax.swing.JSpinner();
+        py1 = new javax.swing.JSpinner();
+        px1 = new javax.swing.JSpinner();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        py2 = new javax.swing.JSpinner();
+        px2 = new javax.swing.JSpinner();
         jLabel4 = new javax.swing.JLabel();
+        py3 = new javax.swing.JSpinner();
+        px3 = new javax.swing.JSpinner();
         jLabel5 = new javax.swing.JLabel();
+        py4 = new javax.swing.JSpinner();
+        px4 = new javax.swing.JSpinner();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(365, 200));
-        setLayout(null);
-        add(tlx);
-        tlx.setBounds(10, 25, 45, 20);
-        add(tly);
-        tly.setBounds(61, 25, 51, 20);
+        getContentPane().setLayout(null);
+        getContentPane().add(py1);
+        py1.setBounds(60, 60, 45, 20);
+        getContentPane().add(px1);
+        px1.setBounds(60, 40, 45, 20);
 
-        trx.setValue(480);
-        add(trx);
-        trx.setBounds(200, 30, 48, 20);
+        jLabel1.setText("0");
+        getContentPane().add(jLabel1);
+        jLabel1.setBounds(80, 20, 34, 14);
 
-        trY.setValue(0
-        );
-        add(trY);
-        trY.setBounds(250, 30, 44, 20);
+        jLabel2.setText("y");
+        getContentPane().add(jLabel2);
+        jLabel2.setBounds(40, 60, 10, 14);
 
-        blx.setValue(640);
-        add(blx);
-        blx.setBounds(10, 51, 45, 20);
+        jLabel3.setText("x");
+        getContentPane().add(jLabel3);
+        jLabel3.setBounds(40, 40, 10, 14);
+        getContentPane().add(py2);
+        py2.setBounds(110, 60, 45, 20);
+        getContentPane().add(px2);
+        px2.setBounds(110, 40, 45, 20);
 
-        bly.setValue(0);
-        add(bly);
-        bly.setBounds(61, 51, 51, 20);
+        jLabel4.setText("0");
+        getContentPane().add(jLabel4);
+        jLabel4.setBounds(130, 20, 34, 14);
+        getContentPane().add(py3);
+        py3.setBounds(160, 60, 45, 20);
+        getContentPane().add(px3);
+        px3.setBounds(160, 40, 45, 20);
 
-        brx.setValue(480);
-        add(brx);
-        brx.setBounds(200, 50, 48, 20);
+        jLabel5.setText("0");
+        getContentPane().add(jLabel5);
+        jLabel5.setBounds(180, 20, 34, 14);
+        getContentPane().add(py4);
+        py4.setBounds(210, 60, 45, 20);
+        getContentPane().add(px4);
+        px4.setBounds(210, 40, 45, 20);
 
-        bry.setValue(640);
-        add(bry);
-        bry.setBounds(250, 50, 44, 20);
-
-        jLabel1.setText("Top Left");
-        add(jLabel1);
-        jLabel1.setBounds(130, 30, 40, 14);
-
-        jLabel2.setText("Top Right");
-        add(jLabel2);
-        jLabel2.setBounds(310, 30, 46, 14);
-
-        jLabel3.setText("Bottom Left");
-        add(jLabel3);
-        jLabel3.setBounds(130, 50, 56, 14);
-
-        jLabel4.setText("Bottom Right");
-        add(jLabel4);
-        jLabel4.setBounds(300, 50, 62, 14);
-
-        jLabel5.setText("x");
-        add(jLabel5);
-        jLabel5.setBounds(15, 5, 20, 14);
-
-        jLabel6.setText("x");
-        add(jLabel6);
-        jLabel6.setBounds(220, 0, 6, 14);
-
-        jLabel7.setText("    y");
-        add(jLabel7);
-        jLabel7.setBounds(260, 0, 18, 14);
-
-        jLabel8.setText("    y");
-        add(jLabel8);
-        jLabel8.setBounds(61, 5, 18, 14);
+        jLabel6.setText("0");
+        getContentPane().add(jLabel6);
+        jLabel6.setBounds(230, 20, 34, 14);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JSpinner blx;
-    private javax.swing.JSpinner bly;
-    private javax.swing.JSpinner brx;
-    private javax.swing.JSpinner bry;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JSpinner tlx;
-    private javax.swing.JSpinner tly;
-    private javax.swing.JSpinner trY;
-    private javax.swing.JSpinner trx;
+    private javax.swing.JSpinner px1;
+    private javax.swing.JSpinner px2;
+    private javax.swing.JSpinner px3;
+    private javax.swing.JSpinner px4;
+    private javax.swing.JSpinner py1;
+    private javax.swing.JSpinner py2;
+    private javax.swing.JSpinner py3;
+    private javax.swing.JSpinner py4;
     // End of variables declaration//GEN-END:variables
 
     private Point getPoint(JSpinner x, JSpinner y) {

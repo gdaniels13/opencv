@@ -25,12 +25,12 @@ public class Main {
         ArrayList<Processor> processors = new ArrayList<>();
         processors.add(new VideoProvidorProcessor(0));
 //        processors.add(new PausingProcessor());
-//        processors.add(new ImageRotatingProcessor(ImageRotatingProcessor.rotate90()));
-//        processors.add(new WindowSelectingProcessor());
-        processors.add(new PerspectiveTransformProcessor());
+        processors.add(new ImageRotatingProcessor(ImageRotatingProcessor.rotate90()));
+        processors.add(new WindowSelectingProcessor());
+//        processors.add(new PerspectiveTransformProcessor());
         //processors.add(new PausingProcessor());
 //        processors.add(new MatrixFrame("asdf"));
-        processors.add(new AutoControlProcessor(true,new DefaultAi()));
+        processors.add(new AutoControlProcessor(false,new DefaultAi()));
 
         ImageProcessor proce = new ImageProcessor(processors);
 

@@ -27,8 +27,10 @@ public class WindowSelectingProcessor implements Processor {
     public Mat process(Mat input) {
         Mat temp = input.clone();
         List<Point> points = wps.getPoints();
-        for (Point point : points) {
-            Core.circle(temp, point, 2, new Scalar(255, 0, 255), 2);
+//        for (Point point : points) {
+        for(int i = 0; i<4; ++i){
+            Core.circle(temp, points.get(i), 2, new Scalar(255, 0, 255), 2);
+            Core.putText(temp, "" + i, points.get(i), 1, 1, new Scalar(255, 0,255),2);
         }
         mf.process(temp);
 

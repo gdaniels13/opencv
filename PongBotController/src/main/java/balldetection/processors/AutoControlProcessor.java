@@ -39,7 +39,9 @@ public class AutoControlProcessor implements Processor {
     public AutoControlProcessor(final boolean streamGcode, AiInterface ail) throws SerialPortException, InterruptedException {
         cfp = new CircleFinderProcessor();
         mf = new MatrixFrame("circles");
-        streamer = new GcodeStreamer();
+        if(streamGcode)
+            streamer = new GcodeStreamer();
+        
         t = new Timer();
         ai = ail;
         t.schedule(new TimerTask() {
@@ -50,7 +52,7 @@ public class AutoControlProcessor implements Processor {
             public void run() {
                 goal = ai.getGoal();
                 try {
-                    if (Math.abs(goal - lastGoal) > 1  && streamGcode && streamer.checkIdle()) {
+                    if (streamGcode && Math.abs(goal - lastGoal) > 1 && streamer.checkIdle()) {
                         streamer.moveToPercent(goal);
                         goal = lastGoal;
                     }
